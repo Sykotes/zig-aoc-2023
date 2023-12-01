@@ -48,7 +48,7 @@ pub fn part1Improved() !void {
     var buf_reader = std.io.bufferedReader(file.reader());
     const in_stream = buf_reader.reader();
 
-    const digits = "0123456789";
+    const digits = "123456789";
 
     var first_num: ?usize = undefined;
     var second_num: ?usize = undefined;
@@ -72,7 +72,7 @@ pub fn part2() !void {
     var buf_reader = std.io.bufferedReader(file.reader());
     const in_stream = buf_reader.reader();
 
-    const digit_chars = "0123456789";
+    const digit_chars = "123456789";
 
     const Digit = struct {
         name: []const u8,
@@ -80,7 +80,6 @@ pub fn part2() !void {
     };
 
     const digits = [_]Digit{
-        Digit{ .name = "zero", .value = 0 },
         Digit{ .name = "one", .value = 1 },
         Digit{ .name = "two", .value = 2 },
         Digit{ .name = "three", .value = 3 },
