@@ -1,7 +1,7 @@
 const std = @import("std");
 
 pub fn part1() !void {
-    const file = try std.fs.cwd().openFile("input_files/day1.txt", .{ .mode = .read_only });
+    const file = try std.fs.cwd().openFile("input_files/day1.txt", .{});
     defer file.close();
 
     var buf_reader = std.io.bufferedReader(file.reader());
@@ -41,9 +41,32 @@ pub fn part1() !void {
     std.debug.print("{}\n", .{total});
 }
 
+pub fn part1Improved() !void {
+    const file = try std.fs.cwd().openFile("input_files/day1.txt", .{});
+    defer file.close();
+
+    var buf_reader = std.io.bufferedReader(file.reader());
+    const in_stream = buf_reader.reader();
+
+    const digits = "0123456789";
+
+    var first_num: ?usize = undefined;
+    var second_num: ?usize = undefined;
+    var total: u16 = 0;
+
+    var buffer: [1024]u8 = undefined;
+    while (try in_stream.readUntilDelimiterOrEof(&buffer, '\n')) |line| {
+        first_num = std.mem.indexOfAny(u8, line, digits);
+        second_num = std.mem.lastIndexOfAny(u8, line, digits);
+
+        total += (line[first_num.?] - '0') * 10 + (line[second_num.?] - '0');
+    }
+    std.debug.print("Day1 Part1: {}\n", .{total});
+}
+
 // a lot of this was "borrowed" from https://github.com/applejag/adventofcode-2023-zig/
 pub fn part2() !void {
-    const file = try std.fs.cwd().openFile("input_files/day1.txt", .{ .mode = .read_only });
+    const file = try std.fs.cwd().openFile("input_files/day1.txt", .{});
     defer file.close();
 
     var buf_reader = std.io.bufferedReader(file.reader());
@@ -81,13 +104,8 @@ pub fn part2() !void {
 
     var buffer: [1024]u8 = undefined;
     while (try in_stream.readUntilDelimiterOrEof(&buffer, '\n')) |line| {
-        number = 0;
-        first_digit = undefined;
-        second_digit = undefined;
-
         possible_char_index = null;
         possible_name_index = null;
-        name_value = 0;
         possible_char_index = std.mem.indexOfAny(u8, line, digit_chars);
 
         for (digits) |digit| {
@@ -143,5 +161,5 @@ pub fn part2() !void {
         number = first_digit * 10 + second_digit;
         total += number;
     }
-    std.debug.print("Total: {}\n", .{total});
+    std.debug.print("Day2 Part2: {}\n", .{total});
 }
