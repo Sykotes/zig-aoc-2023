@@ -13,22 +13,23 @@ const Sets = struct {
 };
 
 fn getSets(line: []const u8) !Sets {
-    var sets_start_index = std.mem.indexOfAny(u8, line, ':');
+    var sets_start_index = std.mem.indexOfAny(u8, line, ": ");
     var sets_in_line = line[sets_start_index.?..];
-    var set_first_index = std.mem.indexOfAny(u8, sets_in_line, ';');
-    var set_last_index = std.mem.lastIndexOfAny(u8, sets_in_line, ';');
+    var set_first_index = std.mem.indexOfAny(u8, sets_in_line, "; ");
+    var set_last_index = std.mem.lastIndexOfAny(u8, sets_in_line, "; ");
 
     const sets = Sets{
         .set_1 = sets_in_line[0..set_first_index.?],
-        .set_2 = sets_in_line[set_first_index.? + 1 .. set_last_index.?],
-        .set_3 = sets_in_line[set_last_index.? + 1 ..],
+        .set_2 = sets_in_line[set_first_index.?..set_last_index.?],
+        .set_3 = sets_in_line[set_last_index.?..],
     };
 
     return sets;
 }
 
 fn getValuesFromSet(sets: Sets) !rgb {
-    _ = sets;
+    var split_set_1 = std.mem.split(u8, sets.set_1, ", ");
+    _ = split_set_1;
     // a set is "10 red, 19 blue, 3 green"
 
     return rgb{
