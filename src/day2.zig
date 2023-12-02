@@ -6,35 +6,35 @@ const rgb = struct {
     blue: u16,
 };
 
-fn getSets(line: []const u8) ![]const u8 {
+const Sets = struct {
+    set_1: []const u8,
+    set_2: []const u8,
+    set_3: []const u8,
+};
+
+fn getSets(line: []const u8) !Sets {
     var sets_start_index = std.mem.indexOfAny(u8, line, ':');
-    var sets = line[sets_start_index.?..];
+    var sets_in_line = line[sets_start_index.?..];
+    var set_first_index = std.mem.indexOfAny(u8, sets_in_line, ';');
+    var set_last_index = std.mem.lastIndexOfAny(u8, sets_in_line, ';');
+
+    const sets = Sets{
+        .set_1 = sets_in_line[0..set_first_index.?],
+        .set_2 = sets_in_line[set_first_index.? + 1 .. set_last_index.?],
+        .set_3 = sets_in_line[set_last_index.? + 1 ..],
+    };
+
     return sets;
 }
 
-fn getValuesFromSet(sets: []const u8) !rgb {
-    var set_end_index = std.mem.indexOfAny(u8, sets, ';');
+fn getValuesFromSet(sets: Sets) !rgb {
+    _ = sets;
+    // a set is "10 red, 19 blue, 3 green"
 
-    var set_1 = sets[0..set_end_index.?];
-    _ = set_1;
-    var set_2 = sets[set_end_index.? + 1 ..];
-    _ = set_2;
-
-    // a set looks like 3 blue, 4 red
-    // or like 1 red, 2 green, 6 blue, 2 green
-    // (not fun)
     return rgb{
         .red = 10,
         .green = 11,
         .blue = 12,
-    };
-}
-
-fn calculateTotalRGB(set_1: rgb, set_2: rgb) !rgb {
-    return rgb{
-        .red = set_1.red + set_2.red,
-        .green = set_1.green + set_2.green,
-        .blue = set_1.blue + set_2.blue,
     };
 }
 
@@ -55,10 +55,6 @@ pub fn part1() !void {
 
     var game_number: u16 = 0;
     _ = game_number;
-    var set_1: rgb = undefined;
-    _ = set_1;
-    var set_2: rgb = undefined;
-    _ = set_2;
     var set_total: rgb = undefined;
     _ = set_total;
 
