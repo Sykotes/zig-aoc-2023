@@ -16,11 +16,30 @@ fn getSetsString(line: []const u8) ![]const u8 {
 fn getSets(sets_string: []const u8) !std.ArrayList(Set) {
     var sets_string_iter = std.mem.split(u8, sets_string, "; ");
     var list_of_sets: std.ArrayList(Set) = std.ArrayList(Set).init(std.heap.page_allocator);
-    _ = list_of_sets;
 
-    while (sets_string_iter.next()) |set| {
-        _ = set;
+    while (sets_string_iter.next()) |set_string| {
+        var set = Set{
+            .r = 0,
+            .g = 0,
+            .b = 0,
+        };
+
+        const index_of_space_maybe = std.mem.indexOfScalar(u8, set_string, ' ');
+        const string_of_number = set_string[0..index_of_space_maybe.?];
+        const number = try std.fmt.parseInt(u8, string_of_number, 10);
+
+        const first_letter_of_colour = set_string[index_of_space_maybe.? + 1];
+        switch (first_letter_of_colour) {
+            'r' => set.r = number,
+            'g' => set.b = number,
+            'b' => set.b = number,
+            else => {},
+        }
+
+        try list_of_sets.append(set);
     }
+
+    return list_of_sets;
 }
 
 fn addUpSetValues(list_of_sets: std.ArrayList(Set)) Set {
@@ -65,6 +84,12 @@ pub fn part1() !void {
         sets_string = try getSetsString(line);
         list_of_sets = try getSets(sets_string);
         total_set = addUpSetValues(list_of_sets);
+
+        if (isValidGame(total_set)) {
+            std.debug.print("Game {} is valid!\n", .{game_id});
+            std.debug.print("Total set:\nRed: {}\nGreen {}\nBlue: {}\n", .{ total_set.r, total_set.g, total_set.b });
+            sum += game_id;
+        }
     }
     std.debug.print("Day2 Part1: {}\n", .{sum});
 }
