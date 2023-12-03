@@ -60,10 +60,6 @@ pub fn part1() !void {
     var game_id: u16 = 0;
     var list_of_sets: std.ArrayList(Set) = undefined;
     var sets_string: []const u8 = undefined;
-    var total_set: Set = undefined;
-    _ = total_set;
-    var is_valid_game = false;
-    _ = is_valid_game;
     var sum: u32 = 0;
 
     var buf_reader = std.io.bufferedReader(file.reader());
