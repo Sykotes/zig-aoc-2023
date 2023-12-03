@@ -1,55 +1,47 @@
 const std = @import("std");
 
-const RGB = struct {
-    red: u16,
-    green: u16,
-    blue: u16,
+const Set = struct {
+    r: u8,
+    g: u8,
+    b: u8,
 };
 
-fn getSets(line: []const u8) !std.ArrayList(RGB) {
-    var sets_start_index = std.mem.indexOfScalar(u8, line, ':');
-    var sets_in_line = line[sets_start_index.? + 2 ..];
+fn getSetsString(line: []const u8) ![]const u8 {
+    const sets_start_index_maybe: ?usize = std.mem.indexOfScalar(u8, line, ':');
+    const sets_string = line[sets_start_index_maybe.? + 2 ..];
 
-    const number_of_sets = std.mem.count(u8, sets_in_line, "; ") + 1;
-    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
-    var set_array = try std.ArrayList(RGB).initCapacity(gpa.allocator(), number_of_sets);
-    errdefer set_array.deinit();
-
-    var split_sets = std.mem.split(u8, sets_in_line, "; ");
-    while (split_sets.next()) |set| {
-        try set_array.append(set);
-    }
-
-    return set_array;
+    return sets_string;
 }
 
-fn getTotalsFromSet(set_array: std.ArrayList(RGB)) !RGB {
-    var sets_total = RGB{
-        .red = 0,
-        .green = 0,
-        .blue = 0,
+fn getSets(sets_string: []const u8) !std.ArrayList(Set) {
+    var sets_string_iter = std.mem.split(u8, sets_string, "; ");
+    var list_of_sets: std.ArrayList(Set) = std.ArrayList(Set).init(std.heap.page_allocator);
+    _ = list_of_sets;
+
+    while (sets_string_iter.next()) |set| {
+        _ = set;
+    }
+}
+
+fn addUpSetValues(list_of_sets: std.ArrayList(Set)) Set {
+    var total_set = Set{
+        .r = 0,
+        .g = 0,
+        .b = 0,
     };
-    for (set_array) |set| {
-        const space_index = std.mem.indexOfScalar(u8, set, ' ');
-        const number_string = set[0..space_index.?];
-        const number = try std.fmt.parseInt(u16, number_string, 10);
-
-        const first_letter_of_colour = set[space_index.? + 1];
-        switch (first_letter_of_colour) {
-            'r' => sets_total.red += number,
-            'g' => sets_total.green += number,
-            'b' => sets_total.blue += number,
-            else => {},
-        }
+    for (list_of_sets.items) |set| {
+        total_set.r += set.r;
+        total_set.g += set.g;
+        total_set.b += set.b;
     }
-    return sets_total;
+
+    return total_set;
 }
 
-fn isValidGame(set_total: RGB) bool {
-    if (set_total.red <= 12) return false;
-    if (set_total.green <= 13) return false;
-    if (set_total.blue <= 14) return false;
-
+fn isValidGame(total_set: Set) bool {
+    if (total_set.r > 12) return false;
+    if (total_set.g > 13) return false;
+    if (total_set.b > 14) return false;
     return true;
 }
 
@@ -57,22 +49,22 @@ pub fn part1() !void {
     const file = try std.fs.cwd().openFile("input_files/day2_test.txt", .{});
     defer file.close();
 
+    var game_id: u8 = 0;
+    var list_of_sets: std.ArrayList(Set) = undefined;
+    var sets_string: []const u8 = undefined;
+    var total_set: Set = undefined;
+    var sum: u32 = 0;
+
     var buf_reader = std.io.bufferedReader(file.reader());
     const in_stream = buf_reader.reader();
 
-    var game_number: u16 = 0;
-    var sets: std.ArrayList(RGB) = undefined;
-    var sets_total: RGB = undefined;
-    var sum: u16 = 0;
-
     var buf: [1024]u8 = undefined;
     while (try in_stream.readUntilDelimiterOrEof(&buf, '\n')) |line| {
-        game_number += 1;
+        game_id += 1;
 
-        sets = try getSets(line);
-        sets_total = try getTotalsFromSet(sets);
-
-        if (isValidGame(sets_total)) sum += game_number;
+        sets_string = try getSetsString(line);
+        list_of_sets = try getSets(sets_string);
+        total_set = addUpSetValues(list_of_sets);
     }
     std.debug.print("Day2 Part1: {}\n", .{sum});
 }
