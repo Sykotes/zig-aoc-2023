@@ -61,6 +61,7 @@ pub fn part1() !void {
     var list_of_sets: std.ArrayList(Set) = undefined;
     var sets_string: []const u8 = undefined;
     var total_set: Set = undefined;
+    _ = total_set;
     var is_valid_game = false;
     _ = is_valid_game;
     var sum: u32 = 0;
@@ -75,15 +76,7 @@ pub fn part1() !void {
         sets_string = try getSetsString(line);
         list_of_sets = try getSets(sets_string);
 
-        if (game_id == 1) {
-            std.debug.print("Total set:\nRed: {}\nGreen: {}\nBlue: {}\n", .{ total_set.r, total_set.g, total_set.b });
-        }
-
-        if (isValidGame(list_of_sets)) {
-            std.debug.print("Valid Game ID: {}\n", .{game_id});
-            std.debug.print("Total set:\nRed: {}\nGreen: {}\nBlue: {}\n", .{ total_set.r, total_set.g, total_set.b });
-            sum += game_id;
-        }
+        if (isValidGame(list_of_sets)) sum += game_id;
     }
     std.debug.print("Day2 Part1: {}\n", .{sum});
 }
