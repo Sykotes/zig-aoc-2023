@@ -58,8 +58,8 @@ pub fn part1() !void {
     defer file.close();
 
     var game_id: u16 = 0;
-    var list_of_sets: std.ArrayList(Set) = undefined;
     var sets_string: []const u8 = undefined;
+    var list_of_sets: std.ArrayList(Set) = undefined;
     var sum: u32 = 0;
 
     var buf_reader = std.io.bufferedReader(file.reader());
@@ -75,4 +75,50 @@ pub fn part1() !void {
         if (isValidGame(list_of_sets)) sum += game_id;
     }
     std.debug.print("Day2 Part1: {}\n", .{sum});
+}
+
+pub fn get_set_power(set_list: std.ArrayList(Set)) !u64 {
+    var power: u64 = 0;
+    var most_set = Set{
+        .r = 0,
+        .g = 0,
+        .b = 0,
+    };
+    for (set_list.items) |set| {
+        if (set.r > most_set.r) {
+            most_set.r = set.r;
+        }
+        if (set.g > most_set.g) {
+            most_set.g = set.g;
+        }
+        if (set.b > most_set.b) {
+            most_set.b = set.b;
+        }
+    }
+    power = @as(u64, most_set.r) * @as(u64, most_set.g) * @as(u64, most_set.b);
+    return power;
+}
+
+pub fn part2() !void {
+    const file = try std.fs.cwd().openFile("input_files/day2.txt", .{});
+    defer file.close();
+
+    var buf_reader = std.io.bufferedReader(file.reader());
+    const in_stream = buf_reader.reader();
+
+    var sets_string: []const u8 = undefined;
+    var set_list: std.ArrayList(Set) = undefined;
+
+    var total_power: u64 = 0;
+
+    var buf: [1024]u8 = undefined;
+    while (try in_stream.readUntilDelimiterOrEof(&buf, '\n')) |line| {
+        sets_string = try getSetsString(line);
+        set_list = try getSets(sets_string);
+
+        const power = try get_set_power(set_list);
+        total_power += power;
+        // std.debug.print("{}\n", .{power});
+    }
+    std.debug.print("POWER: {}\n", .{total_power});
 }
