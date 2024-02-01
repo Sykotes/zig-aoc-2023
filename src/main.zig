@@ -7,5 +7,5 @@ pub fn main() !void {
     // try day1.part1Improved();
     // try day1.part2();
     // try day2.part1();
-    try day2.part2();
+    try day3.part1();
 }
